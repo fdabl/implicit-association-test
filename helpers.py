@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 import csv
 import random
 from psychopy import visual, event, core, gui
@@ -78,16 +77,15 @@ def filterStimuli(stimuli, key, *args):
     return [stim for stim in stimuli if stim[key] in args]
 
 
-def equals(keypress, associate, resmap):
+def equals(keypress, rightAnswer):
     '''event.waitKeys() returns a list of keys or None
     if maxWait has timed out. This functions checks if
     the pressed key matches the right answer accodring
     to a certain response mapping.'''
     try:
-        check = keypress[0]
-        inverted = {v: k for k, v in resmap.items()}
-        return inverted[check] == associate
-    except TypeError:
+        userAnswer = keypress[0]
+        return userAnswer == rightAnswer
+    except (TypeError, IndexError):
         return False
 
 
@@ -100,12 +98,12 @@ def jitterISI(minimum=1, maximum=3, steps=20):
     return ISI
 
 
-def wrapdim(win, coords, **kwargs):
-    dimensions = []
-    for name, quadrant in coords:
-        stim = visual.TextStim(win, text=name, pos=quadrant, **kwargs)
-        dimensions.append(stim)
-    return dimensions
+def wrapdim(win, mapping, **kwargs):
+    stimuli = []
+    for name, coord in mapping.items():
+        stim = visual.TextStim(win, text=name, pos=coord, **kwargs)
+        stimuli.append(stim)
+    return stimuli
 
 
 def autodraw(stimList, draw=True):
