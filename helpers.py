@@ -27,12 +27,12 @@ def getStimuli(path):
     return stimuli
 
 
-def getInput(title, question):
+def getInput(title, questions):
     '''Given an experiment title and a dictionary
     specifying the questions, returns a dictionary where
     question maps to the given answer.'''
-    info = gui.DlgFromDict(dictionary=question, title=title)
-    mapping = {k: v for k, v in zip(question.keys(), info.data)}
+    info = gui.DlgFromDict(dictionary=questions, title=title)
+    mapping = {k: v for k, v in zip(questions.keys(), info.data)}
     return mapping if info.OK else False
 
 
@@ -98,3 +98,15 @@ def jitterISI(minimum=1, maximum=3, steps=20):
     rank = (maximum - minimum) / float(steps)
     ISI = minimum + (rank * random.randint(0, steps))
     return ISI
+
+
+def wrapdim(win, coords, **kwargs):
+    dimensions = []
+    for name, quadrant in coords:
+        stim = visual.TextStim(win, text=name, pos=quadrant, **kwargs)
+        dimensions.append(stim)
+    return dimensions
+
+
+def autodraw(stimList, draw=True):
+    map(lambda stim: stim.setAutoDraw(draw), stimList)
