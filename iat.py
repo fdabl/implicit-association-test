@@ -14,7 +14,7 @@ questions = {'VPN-Code': '', 'Geschlecht': ['m', 'w']}
 info = help.getInput(title, questions).values()
 
 # create all the basic objects (window, fixation-cross, feedback)
-win = visual.Window(size=(900, 700), units='norm', color='black', fullscr=True)
+win = visual.Window(units='norm', color='black', fullscr=True)
 fixCross = visual.TextStim(win, text='+', height=0.1)
 negFeedback = visual.TextStim(win, text='X', color='red', height=0.1)
 win.setMouseVisible(False)
@@ -25,13 +25,12 @@ wrapdim = functools.partial(help.wrapdim, win, height=0.08)
 showInstruction = functools.partial(help.showInstruction, win)
 
 # Response Mappings
-allRes = ('self', 'other', 'pos', 'neg')
-posnegMap = {'pos': 'e', 'neg': 'i'}
-negposMap = {'neg': 'e', 'pos': 'i'}
-selfotherMap = {'self': 'e', 'other': 'i'}
-otherselfMap = {'other': 'e', 'self': 'i'}
-negoposelfMap = dict(negposMap.items() + otherselfMap.items())
-selfnegopoMap = dict(negposMap.items() + selfotherMap.items())
+# you can change the keybindings and allRes to fit your IAT constraints
+keybindings = ['e', 'i']
+allRes = ['self', 'other', 'pos', 'neg']
+allMappings = help.getResponseMappings(allRes, keybindings=keybindings)
+negoposelfMap, selfnegopoMap = allMappings[-2:]
+selfotherMap, otherselfMap, posnegMap, negposMap = allMappings[:4]
 
 pos, neg, self, other = ['Positiv', 'Negativ', 'Selbst', 'Fremd']
 leftup, rightup = (-0.4, -0.3), (+0.4, -0.3)
@@ -48,6 +47,7 @@ negopoself = wrapdim({neg: leftup, other: leftdown,
 
 experimentData = []
 timer = core.Clock()
+# you can easily change the stimuli by changing the csv
 stimuli = help.getStimuli('stimuli.csv')
 
 ISI = 0.5
@@ -94,8 +94,8 @@ def experiment(anchors, responseMap, selection, trialName, trials=20):
     return data
 
 
-def wrap(*args):
-    return functools.partial(experiment, *args)
+def wrap(*args, **kwargs):
+    return functools.partial(experiment, *args, **kwargs)
 
 
 allTrials = {
@@ -109,12 +109,6 @@ allTrials = {
 }
 
 
-def callTrials(pause, **functions):
-    for function in functions:
-        function()
-        pause()
-
-
 def main():
     '''There are only two hard things in Computer Science:
     cache invalidation and naming things.
@@ -126,26 +120,25 @@ def main():
     pause = lambda text: showInstruction(text=text, height=0.1)
     header = ['ISI', 'Content', 'corrAns', 'RT', 'trialName']
 
+    # after a trial, you can call pause(text=customText, **kwargs)
+    # to show a instruction for the next block
     if random.randint(0, 1):
-        callTrials(pause,
-                   allTrials['otherSelf'](),
-                   allTrials['negPos'](),
-                   allTrials['negOPself'](),
-                   allTrials['negOPself40'](trials=40),
-                   allTrials['selfOther'](trials=40),
-                   allTrials['selfNOpos'](),
-                   allTrials['selfNOpos40'](trials=40),
-                   )
+        otherSelf = allTrials['otherSelf']()
+        negPos = allTrials['negPos']()
+        negOPself = allTrials['negOPself']()
+        negOPself40 = allTrials['negOPself40'](trials=40)
+        selfOther = allTrials['selfOther'](trials=40)
+        selfNOpos = allTrials['selfNOpos']()
+        selfNOpos40 = allTrials['selfNOpos40'](trials=40)
+
     else:
-        callTrials(pause,
-                   allTrials['selfOther'](),
-                   allTrials['negPos'](),
-                   allTrials['selfNOpos'](),
-                   allTrials['selfNOpos40'](trials=40),
-                   allTrials['otherSelf'](trials=40),
-                   allTrials['negOPself'](),
-                   allTrials['negOPself40'](trials=40),
-                   )
+        selfOther = allTrials['selfOther']()
+        negPos = allTrials['negPos']()
+        selfNOpos = allTrials['selfNOpos']()
+        selfNOpos40 = allTrials['selfNOpos40'](trials=40)
+        otherSelf = allTrials['otherSelf'](trials=40)
+        negOPself = allTrials['negOPself']()
+        negOPself40 = allTrials['negOPself40'](trials=40)
 
     ## Save Data to CSV
     experimentData.extend([info, header])

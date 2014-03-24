@@ -55,6 +55,22 @@ def draw(win, stim, time=None):
         core.wait(time)
 
 
+def invert(d):
+    return {k: v for k, v in zip(d.keys(), reversed(d.values()))}
+
+
+def getResponseMappings(dimensions, keybindings=['e', 'i']):
+    '''dimensions is a list of the all possible responses.
+    Maps them to the keybindings accordingly.'''
+    selfOther = {k: v for k, v in zip(dimensions[:2], keybindings)}
+    posNeg = {k: v for k, v in zip(dimensions[2:], keybindings)}
+    otherSelf = invert(selfOther)
+    negPos = invert(posNeg)
+    negopoself = dict(negPos.items() + otherSelf.items())
+    selfnegopo = dict(negPos.items() + selfOther.items())
+    return (selfOther, otherSelf, posNeg, negPos, negopoself, selfnegopo)
+
+
 def showInstruction(win, stopkeys=['space'], text=None, image=None, **kwargs):
     '''Given an Image or some Text, shows the Instruction page until
     the User presses - per default - space. This default can be changed

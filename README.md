@@ -1,6 +1,10 @@
 # Implicit Association Test
 Implementation of the IAT in a clean and modular fashion.
 
+You can configure it to match your specific IAT type by changing the
+stimuli.csv file and the variables allRes (line 30) and pos, neg, self, other (line 35). 
+In the main function, you can add your specific instructions beneath each block.
+
 helpers.py contains functions that are experiment agnostic and can be
 used generically. Some tweaking may be required.
 
