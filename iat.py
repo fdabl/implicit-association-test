@@ -17,6 +17,7 @@ info = help.getInput(title, questions).values()
 win = visual.Window(size=(900, 700), units='norm', color='black', fullscr=True)
 fixCross = visual.TextStim(win, text='+', height=0.1)
 negFeedback = visual.TextStim(win, text='X', color='red', height=0.1)
+win.setMouseVisible(False)
 
 # partially apply the helper functions to suite our needs
 draw = functools.partial(help.draw, win)
@@ -30,17 +31,18 @@ negposMap = {'neg': 'e', 'pos': 'i'}
 selfotherMap = {'self': 'e', 'other': 'i'}
 otherselfMap = {'other': 'e', 'self': 'i'}
 negoposelfMap = dict(negposMap.items() + otherselfMap.items())
-selfnegopoMap = dict(posnegMap.items() + selfotherMap.items())
+selfnegopoMap = dict(negposMap.items() + selfotherMap.items())
 
 pos, neg, self, other = ['Positiv', 'Negativ', 'Selbst', 'Fremd']
 leftup, rightup = (-0.4, -0.3), (+0.4, -0.3)
 leftdown, rightdown = (-0.4, -0.4), (+0.4, -0.4)
 
+# this could be implemented better, naming is pretty hard
 otherself = wrapdim({other: leftup, self: rightup})
 negpos = wrapdim({neg: leftup, pos: rightup})
 selfother = wrapdim({self: leftup, other: rightup})
-selfnegopo = wrapdim({self: leftup, neg: rightup,
-                      other: rightdown, pos: leftdown})
+selfnegopo = wrapdim({self: leftup, neg: leftdown,
+                      other: rightup, pos: rightdown})
 negopoself = wrapdim({neg: leftup, other: leftdown,
                       pos: rightup, self: rightdown})
 
@@ -59,12 +61,13 @@ Start by pressing Space.
 '''
 
 
-def experiment(anchors, responseMap, selection, trials=20):
+def experiment(anchors, responseMap, selection, trialName, trials=20):
     data = []
 
     help.autodraw(anchors)
-    selectedStim = help.filterStimuli(stimuli, 'response', *selection) * 2
-    randomStim = sorted(selectedStim, key=lambda x: random.random())[:trials]
+    selectedStimuli = help.filterStimuli(stimuli, 'response', *selection) * 2
+    unique = help.filterDoubles(selectedStimuli)
+    randomStim = sorted(unique, key=lambda x: random.random())[:trials]
 
     for stimulus in randomStim:
         content = stimulus['content']
@@ -74,7 +77,7 @@ def experiment(anchors, responseMap, selection, trials=20):
         timer.reset()
         draw(curStim)
         rightKeys = responseMap.values() + ['escape']
-        userAnswer = event.waitKeys(keyList=rightKeys, maxWait=TIMEOUT) or []
+        userAnswer = event.waitKeys(keyList=rightKeys) or []
         choseWisely = help.equals(userAnswer, rightAnswer)
         if choseWisely:
             RT = timer.getTime()
@@ -82,12 +85,34 @@ def experiment(anchors, responseMap, selection, trials=20):
             core.quit()
         else:
             RT = 9999
+            draw(negFeedback, feedbackTime)
             draw(curStim)
             event.waitKeys(keyList=[rightAnswer])
-        data.append([ISI, content, int(RT != 9999), RT])
+        data.append([ISI, content, int(RT != 9999), RT, trialName])
         draw(fixCross, ISI)
     help.autodraw(anchors, draw=False)
     return data
+
+
+def wrap(*args):
+    return functools.partial(experiment, *args)
+
+
+allTrials = {
+    'otherSelf': wrap(otherself, otherselfMap, allRes[:2], 'otherSelf'),
+    'negPos': wrap(negpos, negposMap, allRes[2:], 'negativePos'),
+    'negOPself': wrap(negopoself, negoposelfMap, allRes, 'negOPself'),
+    'negOPself40': wrap(negopoself, negoposelfMap, allRes, 'negOPself40'),
+    'selfOther': wrap(selfother, selfotherMap, allRes[:2], 'selfOther'),
+    'selfNOpos': wrap(selfnegopo, selfnegopoMap, allRes, 'selfNOpos'),
+    'selfNOpos40': wrap(selfnegopo, selfnegopoMap, allRes, 'selfNOpos40')
+}
+
+
+def callTrials(pause, **functions):
+    for function in functions:
+        function()
+        pause()
 
 
 def main():
@@ -99,28 +124,28 @@ def main():
     showInstruction(text=instruction, height=0.1)
     text = 'Chill. Continue with Space'
     pause = lambda text: showInstruction(text=text, height=0.1)
-    header = ['ISI', 'Content', 'corrAns', 'RT']
+    header = ['ISI', 'Content', 'corrAns', 'RT', 'trialName']
 
-    # Step 1 and Step 2
-    otherSelf = experiment(otherself, otherselfMap, allRes[:2])
-    pause(text)
-    negPos = experiment(negpos, negposMap, allRes[2:])
-    pause(text)
-
-    ## Step 3 and Step 4
-    negOPself = experiment(negopoself, negoposelfMap, allRes)
-    pause(text)
-    negOPself40 = experiment(negopoself, negoposelfMap, allRes, trials=40)
-    pause(text)
-
-    ## Step 5
-    selfOther = experiment(selfother, selfotherMap, allRes[:2])
-    pause(text)
-
-    ## Step 6 and 7
-    selfNOpos = experiment(selfnegopo, selfnegopoMap, allRes)
-    pause(text)
-    selfNOpos40 = experiment(selfnegopo, selfnegopoMap, allRes, trials=40)
+    if random.randint(0, 1):
+        callTrials(pause,
+                   allTrials['otherSelf'](),
+                   allTrials['negPos'](),
+                   allTrials['negOPself'](),
+                   allTrials['negOPself40'](trials=40),
+                   allTrials['selfOther'](trials=40),
+                   allTrials['selfNOpos'](),
+                   allTrials['selfNOpos40'](trials=40),
+                   )
+    else:
+        callTrials(pause,
+                   allTrials['selfOther'](),
+                   allTrials['negPos'](),
+                   allTrials['selfNOpos'](),
+                   allTrials['selfNOpos40'](trials=40),
+                   allTrials['otherSelf'](trials=40),
+                   allTrials['negOPself'](),
+                   allTrials['negOPself40'](trials=40),
+                   )
 
     ## Save Data to CSV
     experimentData.extend([info, header])

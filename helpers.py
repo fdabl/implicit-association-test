@@ -108,3 +108,11 @@ def wrapdim(win, mapping, **kwargs):
 
 def autodraw(stimList, draw=True):
     map(lambda stim: stim.setAutoDraw(draw), stimList)
+
+
+def filterDoubles(stimuli):
+    unique = []
+    for s1, s2 in zip(stimuli, stimuli[1:]):
+        if s1 != s2:
+            unique.append(s1)
+    return unique
