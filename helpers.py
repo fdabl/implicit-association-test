@@ -107,7 +107,7 @@ def equals(keypress, rightAnswer):
 
 def jitterISI(minimum=1, maximum=3, steps=20):
     '''Compute the ISI according to a minimum and a maximum.
-    It follows a gaussian distribution, with the peak at
+    It follows a uniform distribution, with the peak at
     (minimum + maximum) / 2.'''
     rank = (maximum - minimum) / float(steps)
     ISI = minimum + (rank * random.randint(0, steps))
@@ -132,3 +132,12 @@ def filterDoubles(stimuli):
         if s1 != s2:
             unique.append(s1)
     return unique
+
+
+def deneigh(stimuli):
+    '''Fear not! The complexity of this
+    bogosort like algorithm does not approach
+    infinity when using a reasonable amount of trials.'''
+    while not all(s1 != s2 for s1, s2 in zip(stimuli, stimuli[1:])):
+        random.shuffle(stimuli)
+    return stimuli

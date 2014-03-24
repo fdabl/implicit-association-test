@@ -65,10 +65,10 @@ def experiment(anchors, responseMap, selection, trialName, trials=1):
 
     help.autodraw(anchors)
     selectedStimuli = help.filterStimuli(stimuli, 'response', *selection) * 2
-    unique = help.filterDoubles(selectedStimuli)
-    randomStim = sorted(unique, key=lambda x: random.random())[:trials]
+    randomStim = sorted(selectedStimuli, key=lambda x: random.random())[:trials]
+    preparedStim = help.deneigh(randomStim)
 
-    for stimulus in randomStim:
+    for stimulus in preparedStim:
         content = stimulus['content']
         rightAnswer = responseMap[stimulus['response']]
         ISI = help.jitterISI(minimum=0.5, maximum=1.5)
