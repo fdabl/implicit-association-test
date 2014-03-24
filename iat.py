@@ -10,8 +10,8 @@ from psychopy import visual, event, core, gui
 
 # get user data before setup, since Dlg does not work in fullscreen
 title = 'Impliziter Assoziations Test'
-questions = {'VPN-Code': '', 'Geschlecht': ['m', 'w']}
-info = help.getInput(title, questions).values()
+questions = {'Pbn': '', 'Geschlecht': ['m', 'w']}
+info = help.getInput(title, questions) or core.quit()
 
 # create all the basic objects (window, fixation-cross, feedback)
 win = visual.Window(units='norm', color='black', fullscr=True)
@@ -50,7 +50,6 @@ timer = core.Clock()
 # you can easily change the stimuli by changing the csv
 stimuli = help.getStimuli('stimuli.csv')
 
-ISI = 0.5
 TIMEOUT = 1.5
 feedbackTime = 1
 instruction = '''
@@ -61,7 +60,7 @@ Start by pressing Space.
 '''
 
 
-def experiment(anchors, responseMap, selection, trialName, trials=20):
+def experiment(anchors, responseMap, selection, trialName, trials=1):
     data = []
 
     help.autodraw(anchors)
@@ -90,6 +89,7 @@ def experiment(anchors, responseMap, selection, trialName, trials=20):
             event.waitKeys(keyList=[rightAnswer])
         data.append([ISI, content, int(RT != 9999), RT, trialName])
         draw(fixCross, ISI)
+
     help.autodraw(anchors, draw=False)
     return data
 
@@ -102,10 +102,10 @@ allTrials = {
     'otherSelf': wrap(otherself, otherselfMap, allRes[:2], 'otherSelf'),
     'negPos': wrap(negpos, negposMap, allRes[2:], 'negativePos'),
     'negOPself': wrap(negopoself, negoposelfMap, allRes, 'negOPself'),
-    'negOPself40': wrap(negopoself, negoposelfMap, allRes, 'negOPself40'),
+    'negOPself1': wrap(negopoself, negoposelfMap, allRes, 'negOPself1'),
     'selfOther': wrap(selfother, selfotherMap, allRes[:2], 'selfOther'),
     'selfNOpos': wrap(selfnegopo, selfnegopoMap, allRes, 'selfNOpos'),
-    'selfNOpos40': wrap(selfnegopo, selfnegopoMap, allRes, 'selfNOpos40')
+    'selfNOpos1': wrap(selfnegopo, selfnegopoMap, allRes, 'selfNOpos1')
 }
 
 
@@ -116,36 +116,36 @@ def main():
     '''
     # Instruction Setup
     showInstruction(text=instruction, height=0.1)
-    text = 'Chill. Continue with Space'
-    pause = lambda text: showInstruction(text=text, height=0.1)
     header = ['ISI', 'Content', 'corrAns', 'RT', 'trialName']
 
-    # after a trial, you can call pause(text=customText, **kwargs)
+    # after a trial, you can call showInstruction
     # to show a instruction for the next block
-    if random.randint(0, 1):
+    order = random.randint(0, 1)
+    if order:
         otherSelf = allTrials['otherSelf']()
         negPos = allTrials['negPos']()
         negOPself = allTrials['negOPself']()
-        negOPself40 = allTrials['negOPself40'](trials=40)
-        selfOther = allTrials['selfOther'](trials=40)
+        negOPself1 = allTrials['negOPself1'](trials=1)
+        selfOther = allTrials['selfOther'](trials=1)
         selfNOpos = allTrials['selfNOpos']()
-        selfNOpos40 = allTrials['selfNOpos40'](trials=40)
+        selfNOpos1 = allTrials['selfNOpos1'](trials=1)
 
     else:
         selfOther = allTrials['selfOther']()
         negPos = allTrials['negPos']()
         selfNOpos = allTrials['selfNOpos']()
-        selfNOpos40 = allTrials['selfNOpos40'](trials=40)
-        otherSelf = allTrials['otherSelf'](trials=40)
+        selfNOpos1 = allTrials['selfNOpos1'](trials=1)
+        otherSelf = allTrials['otherSelf'](trials=1)
         negOPself = allTrials['negOPself']()
-        negOPself40 = allTrials['negOPself40'](trials=40)
+        negOPself1 = allTrials['negOPself1'](trials=1)
 
     ## Save Data to CSV
-    experimentData.extend([info, header])
-    everything = (otherSelf + negPos + negOPself + negOPself40 +
-                  selfOther + selfNOpos + selfNOpos40)
+    experimentData.extend([info.values(), header])
+    everything = (otherSelf + negPos + negOPself + negOPself1 +
+                  selfOther + selfNOpos + selfNOpos1)
 
     experimentData.extend(everything)
-    help.saveData('data.csv', experimentData)
+    file = '{0}_{1}.csv'.format(info['Pbn'], order)
+    help.saveData(file, experimentData)
 
 main()
