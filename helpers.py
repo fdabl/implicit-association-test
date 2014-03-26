@@ -196,8 +196,11 @@ def runExperiment(pause, instructionOrder, blockOrder):
         trialCount += 1
         if instr is None:
             continue
+        elif isImage(instr):
+            pause(image=instr)
+        else:
+            pause(text=instr)
 
-        pause(image=instr) if isImage(instr) else pause(text=instr)
         current = block(trials=40) if trialCount == 5 else block()
         data.extend(current)
 

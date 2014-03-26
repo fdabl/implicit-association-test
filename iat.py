@@ -60,8 +60,8 @@ def block(anchors, responseMap, selection, trialName, trials=20):
     help.autodraw(anchors)
 
     filteredStim = help.filterStimuli(stimuli, 'response', *selection)
-    extendedStim = help.compensate(filteredStim, trials)[:trials]
-    randomStim = sorted(extendedStim, key=lambda x: random.random())
+    extendedStim = help.compensate(filteredStim, trials)
+    randomStim = sorted(extendedStim, key=lambda x: random.random())[:trials]
     preparedStim = help.deneigh(randomStim)
 
     for stimulus in preparedStim:
