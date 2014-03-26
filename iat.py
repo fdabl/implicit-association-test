@@ -21,8 +21,8 @@ win.setMouseVisible(False)
 
 # partially apply the helper functions to suite our needs
 draw = functools.partial(help.draw, win)
+show = functools.partial(help.showInstruction, win)
 wrapdim = functools.partial(help.wrapdim, win, height=0.08)
-showInstruction = functools.partial(help.showInstruction, win)
 
 # Response Mappings
 # you can change the keybindings and allRes to fit your IAT constraints
@@ -50,32 +50,28 @@ timer = core.Clock()
 # you can easily change the stimuli by changing the csv
 stimuli = help.getStimuli('stimuli.csv')
 
+ISI = 0.150
 TIMEOUT = 1.5
 feedbackTime = 1
-instruction = '''
-This is a Implicit Association Task.
-Have Fun!
-
-Start by pressing Space.
-'''
 
 
-def experiment(anchors, responseMap, selection, trialName, trials=1):
+def block(anchors, responseMap, selection, trialName, trials=20):
     data = []
-
     help.autodraw(anchors)
-    selectedStimuli = help.filterStimuli(stimuli, 'response', *selection) * 2
-    randomStim = sorted(selectedStimuli, key=lambda x: random.random())[:trials]
+
+    filteredStim = help.filterStimuli(stimuli, 'response', *selection)
+    extendedStim = help.compensate(filteredStim, trials)[:trials]
+    randomStim = sorted(extendedStim, key=lambda x: random.random())
     preparedStim = help.deneigh(randomStim)
 
     for stimulus in preparedStim:
+        onTime = True
         content = stimulus['content']
         rightAnswer = responseMap[stimulus['response']]
-        ISI = help.jitterISI(minimum=0.5, maximum=1.5)
         curStim = visual.TextStim(win, text=content, height=0.1)
-        timer.reset()
-        draw(curStim)
         rightKeys = responseMap.values() + ['escape']
+        draw(curStim)
+        timer.reset()
         userAnswer = event.waitKeys(keyList=rightKeys) or []
         choseWisely = help.equals(userAnswer, rightAnswer)
         if choseWisely:
@@ -83,11 +79,12 @@ def experiment(anchors, responseMap, selection, trialName, trials=1):
         elif 'escape' in userAnswer:
             core.quit()
         else:
-            RT = 9999
+            RT = timer.getTime()
+            onTime = False
             draw(negFeedback, feedbackTime)
             draw(curStim)
             event.waitKeys(keyList=[rightAnswer])
-        data.append([ISI, content, int(RT != 9999), RT, trialName])
+        data.append([ISI, content, int(onTime), RT, trialName])
         draw(fixCross, ISI)
 
     help.autodraw(anchors, draw=False)
@@ -95,57 +92,45 @@ def experiment(anchors, responseMap, selection, trialName, trials=1):
 
 
 def wrap(*args, **kwargs):
-    return functools.partial(experiment, *args, **kwargs)
+    return functools.partial(block, *args, **kwargs)
 
 
-allTrials = {
-    'otherSelf': wrap(otherself, otherselfMap, allRes[:2], 'otherSelf'),
-    'negPos': wrap(negpos, negposMap, allRes[2:], 'negativePos'),
-    'negOPself': wrap(negopoself, negoposelfMap, allRes, 'negOPself'),
-    'negOPself1': wrap(negopoself, negoposelfMap, allRes, 'negOPself1'),
-    'selfOther': wrap(selfother, selfotherMap, allRes[:2], 'selfOther'),
-    'selfNOpos': wrap(selfnegopo, selfnegopoMap, allRes, 'selfNOpos'),
-    'selfNOpos1': wrap(selfnegopo, selfnegopoMap, allRes, 'selfNOpos1')
+allBlocks = {
+    1: wrap(otherself, otherselfMap, allRes[:2], 'otherSelf'),
+    2: wrap(negpos, negposMap, allRes[2:], 'negativePos'),
+    3: wrap(negopoself, negoposelfMap, allRes, 'negOPself'),
+    4: wrap(negopoself, negoposelfMap, allRes, 'negOPself40', trials=40),
+    5: wrap(selfother, selfotherMap, allRes[:2], 'selfOther'),
+    6: wrap(selfnegopo, selfnegopoMap, allRes, 'selfNOpos'),
+    7: wrap(selfnegopo, selfnegopoMap, allRes, 'selfNOpos40', trials=40)
 }
 
 
 def main():
-    '''There are only two hard things in Computer Science:
-    cache invalidation and naming things.
-    -- Phil Karlton
-    '''
     # Instruction Setup
-    showInstruction(text=instruction, height=0.1)
     header = ['ISI', 'Content', 'corrAns', 'RT', 'trialName']
+    mainInstruction = 'instructions/mainInstruction.png'
+    instructions = {1: 'instructions/instr1.png',
+                    2: 'instructions/instr2.png',
+                    3: 'instructions/instr3.png',
+                    4: 'instructions/instr4.png',
+                    5: 'instructions/instr5.png',
+                    6: 'instructions/instr6.png',
+                    7: 'instructions/instr7.png'}
 
-    # after a trial, you can call showInstruction
-    # to show a instruction for the next block
-    order = random.randint(0, 1)
-    if order:
-        otherSelf = allTrials['otherSelf']()
-        negPos = allTrials['negPos']()
-        negOPself = allTrials['negOPself']()
-        negOPself1 = allTrials['negOPself1'](trials=1)
-        selfOther = allTrials['selfOther'](trials=1)
-        selfNOpos = allTrials['selfNOpos']()
-        selfNOpos1 = allTrials['selfNOpos1'](trials=1)
+    show(image=mainInstruction)
+    trialType = random.randint(0, 1)
+    order = [1, 2, 3, 4, 5, 6, 7] if trialType else [5, 2, 6, 7, 1, 3, 4]
 
-    else:
-        selfOther = allTrials['selfOther']()
-        negPos = allTrials['negPos']()
-        selfNOpos = allTrials['selfNOpos']()
-        selfNOpos1 = allTrials['selfNOpos1'](trials=1)
-        otherSelf = allTrials['otherSelf'](trials=1)
-        negOPself = allTrials['negOPself']()
-        negOPself1 = allTrials['negOPself1'](trials=1)
+    # order the blocks and instruction according to the trialType
+    blockOrder = [allBlocks[num] for num in order]
+    instructionOrder = [instructions[num] for num in order]
+    data = help.runExperiment(show, instructionOrder, blockOrder)
 
     ## Save Data to CSV
     experimentData.extend([info.values(), header])
-    everything = (otherSelf + negPos + negOPself + negOPself1 +
-                  selfOther + selfNOpos + selfNOpos1)
-
-    experimentData.extend(everything)
-    file = '{0}_{1}.csv'.format(info['Pbn'], order)
+    experimentData.extend(data)
+    file = '{0}_{1}.csv'.format(info['Pbn'], trialType)
     help.saveData(file, experimentData)
 
 main()

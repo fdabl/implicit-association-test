@@ -6,7 +6,17 @@ stimuli.csv file and the variables allRes (line 30) and pos, neg, self, other (l
 In the main function, you can add your specific instructions beneath each block.
 
 helpers.py contains functions that are experiment agnostic and can be
-used generically. Some tweaking may be required.
+used generically. Some tweaking may be required. You can get only the helpers.py
+with 
+
+```
+curl https://raw.github.com/dostodabsi/implicit-association-test/master/helpers.py > helpers.py
+```
+or
+
+```
+wget -qO- https://raw.github.com/dostodabsi/implicit-association-test/master/helpers.py > helpers.py
+```
 
 The guys at <a href="http://gureckislab.org/">gureckislab</a> try to establish a <a href="http://psiturk.org">platform</a>
 where browser-based experiments can be shared among researchers. In the spirit of
@@ -17,7 +27,7 @@ or contact me over Twitter at <a href="http://twitter.com/fdabl" target="_blank"
 # Licence
 The MIT License (MIT)
 
-Copyright (c) [2014] [Fabian Dablander]
+Copyright (c) 2014 Fabian Dablander
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in

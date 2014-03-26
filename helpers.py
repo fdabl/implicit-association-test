@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
+import os
 import csv
 import random
+import itertools
 from psychopy import visual, event, core, gui
 
 
@@ -115,6 +118,8 @@ def jitterISI(minimum=1, maximum=3, steps=20):
 
 
 def wrapdim(win, mapping, **kwargs):
+    '''Returns a list with visual.TextStim name and pos
+    set according to a mapping dictionary.'''
     stimuli = []
     for name, coord in mapping.items():
         stim = visual.TextStim(win, text=name, pos=coord, **kwargs)
@@ -141,3 +146,59 @@ def deneigh(stimuli):
     while not all(s1 != s2 for s1, s2 in zip(stimuli, stimuli[1:])):
         random.shuffle(stimuli)
     return stimuli
+
+
+def compensate(stimuli, trials):
+    '''Randomly adds more Stimuli if there are not enough
+    as needed by the amount of trials.'''
+    diff = trials - len(stimuli)
+    if diff > 0:
+        more = [random.choice(stimuli) for _ in range(diff)]
+        return stimuli + more
+    return stimuli
+
+
+def isImage(string):
+    images = ['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG']
+    return string.rsplit('.', 1)[-1] in images
+
+
+def getImages(path):
+    '''Get all images that a at the top level of a directory.'''
+    images = filter(lambda x: isImage(x), os.listdir(path))
+    return [os.path.join(path, image) for image in images]
+
+
+def sortImages(images):
+    '''If images contain digits, e.g. instr1, instr2,
+    sorts them accordingly. mainInstruction - has no number -
+    will be on the first place.'''
+    byNumber = lambda image: [d for d in images]
+    sortedImages = sorted(images, key=byNumber)
+    return sortedImages[0], sortedImages[1:]
+
+
+def orderSpec(array, order):
+    '''Order an array according to another array that
+    specifies the needed order.'''
+    return [array[x] for x in map(lambda x: x - 1, order)]
+
+
+def runExperiment(pause, instructionOrder, blockOrder):
+    '''pause is a function that is called between each block.
+    instructionOrder and blockOrder a self explanatory. izip_longest
+    is need, if there is not an instruction after each block.'''
+    data = []
+    trialCount = 0
+    mapping = itertools.izip_longest(instructionOrder, blockOrder)
+
+    for instr, block in mapping:
+        trialCount += 1
+        if instr is None:
+            continue
+
+        pause(image=instr) if isImage(instr) else pause(text=instr)
+        current = block(trials=40) if trialCount == 5 else block()
+        data.extend(current)
+
+    return data
