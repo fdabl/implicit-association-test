@@ -33,8 +33,8 @@ negoposelfMap, selfnegopoMap = allMappings[-2:]
 selfotherMap, otherselfMap, posnegMap, negposMap = allMappings[:4]
 
 pos, neg, self, other = ['Positiv', 'Negativ', 'Selbst', 'Fremd']
-leftup, rightup = (-0.4, -0.3), (+0.4, -0.3)
-leftdown, rightdown = (-0.4, -0.4), (+0.4, -0.4)
+leftup, rightup = (-0.8, +0.8), (+0.8, +0.8)
+leftdown, rightdown = (-0.8, +0.7), (+0.8, +0.7)
 
 # this could be implemented better, naming is pretty hard
 otherself = wrapdim({other: leftup, self: rightup})

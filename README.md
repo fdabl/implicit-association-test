@@ -10,12 +10,7 @@ used generically. Some tweaking may be required. You can get only the helpers.py
 with 
 
 ```
-curl https://raw.github.com/dostodabsi/implicit-association-test/master/helpers.py > helpers.py
-```
-or
-
-```
-wget -qO- https://raw.github.com/dostodabsi/implicit-association-test/master/helpers.py > helpers.py
+curl -O https://raw.github.com/dostodabsi/implicit-association-test/master/helpers.py
 ```
 
 The guys at <a href="http://gureckislab.org/">gureckislab</a> try to establish a <a href="http://psiturk.org">platform</a>
@@ -24,24 +19,5 @@ open science, I'd love to see a similar platform emerge for desktop experiments 
 in Python / PsychoPy. If you have any ideas, please drop me an email at <a href="mailto: dostodabsi@gmail.com">dostodabsi@gmail.com</a>
 or contact me over Twitter at <a href="http://twitter.com/fdabl" target="_blank">@fdabl</a>
 
-# Licence
-The MIT License (MIT)
-
-Copyright (c) 2014 Fabian Dablander
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# LICENCE
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>

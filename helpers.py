@@ -26,7 +26,7 @@ def getStimuli(path):
         for line in file:
             stim = {k: v for k, v in zip(header, line)}
             stimuli.append(stim)
-    return stimuli
+        return stimuli
 
 
 def getInput(title, questions):
@@ -109,9 +109,7 @@ def equals(keypress, rightAnswer):
 
 
 def jitterISI(minimum=1, maximum=3, steps=20):
-    '''Compute the ISI according to a minimum and a maximum.
-    It follows a uniform distribution, with the peak at
-    (minimum + maximum) / 2.'''
+    '''Compute the ISI according to a minimum and a maximum.'''
     rank = (maximum - minimum) / float(steps)
     ISI = minimum + (rank * random.randint(0, steps))
     return ISI
@@ -167,15 +165,6 @@ def getImages(path):
     '''Get all images that a at the top level of a directory.'''
     images = filter(lambda x: isImage(x), os.listdir(path))
     return [os.path.join(path, image) for image in images]
-
-
-def sortImages(images):
-    '''If images contain digits, e.g. instr1, instr2,
-    sorts them accordingly. mainInstruction - has no number -
-    will be on the first place.'''
-    byNumber = lambda image: [d for d in images]
-    sortedImages = sorted(images, key=byNumber)
-    return sortedImages[0], sortedImages[1:]
 
 
 def orderSpec(array, order):
