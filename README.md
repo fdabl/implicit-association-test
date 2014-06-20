@@ -1,5 +1,7 @@
 # Implicit Association Test
 
+[![DOI](https://zenodo.org/badge/4738/dostodabsi/implicit-association-test.png)](http://dx.doi.org/10.5281/zenodo.10603)
+
 The Implicit Association Test (IAT) is a measure of implicit cognition, see the original paper here:
 
 Greenwald, A. G., McGhee, D. E., & Schwartz, J. L. (1998). Measuring individual differences in implicit cognition:
@@ -33,12 +35,9 @@ or contact me over Twitter at <a href="http://twitter.com/fdabl" target="_blank"
 
 You are welcome to use this code for personal or academic uses. If you fork, or use this in an academic paper please cite as follows:
 
-Dablander, F. (2014). Implicit Association Test in Python (Version 1.00)[Software]. Available from [https://github.com/dostodabsi/implicit-association-test](https://github.com/dostodabsi/implicit-association-test).
-
+Dablander, F. (2014). Implicit Association Test in Python (Version 1.00)[Software].
+Available from [https://github.com/dostodabsi/implicit-association-test](https://github.com/dostodabsi/implicit-association-test). doi:10.5281/zenodo.10603
 
 # Note
 The code was originally written for the bachelor thesis of my dear colleague Gabriela Hofer ([@gabriela_hofer](https://twitter.com/gabriela_hofer)). She
 read up on the whole literature and gave me detailed instructions on the IAT.
-
-# LICENCE
-<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
