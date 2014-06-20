@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+# Version 1.00
 import csv
 import random
 import functools
